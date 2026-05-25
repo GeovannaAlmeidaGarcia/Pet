@@ -1,0 +1,33 @@
+{
+  "tarefa": [
+    {
+      "id": "1",
+      "nome": "Limpar a sala"
+    },
+    {
+      "id": "2",
+      "nome": "Dar ração para os cachorro de casa"
+    },
+    {
+      "id": "3",
+      "nome": "Dar ração para o peludo na minha vó"
+    },
+    {
+      "id": "4",
+      "nome": "Dar ração para a neguinha"
+    },
+    {
+      "id": "5",
+      "nome": "Limpar o fundo"
+    },
+    {
+      "id": "6",
+      "nome": "Trocar a água deles"
+    },
+    {
+      "nome": "Passear com eles (um de cada vez), por 30 minutos 2x ao dia",
+      "id": "YMOiTO1oLJ4"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
