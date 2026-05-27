@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:prova/screens/post.dart';
 
 class TelaGet extends StatefulWidget {
   const TelaGet({super.key});
@@ -11,32 +10,70 @@ class TelaGet extends StatefulWidget {
 }
 
 class _TelaGetState extends State<TelaGet> {
-  String resultadoApi = "Aperte o botão";
 
-  void fazerGet() async {
-    final respostaServidor =
-        await http.get(Uri.parse("http://localhost:3000/tarefa"));
+  List pets = [];
+  List tarefas = [];
 
-    if (respostaServidor.statusCode == 200) {
-      final dados = jsonDecode(respostaServidor.body);
+  @override
+  void initState() {
+    super.initState();
+    carregarTudo();
+  }
+
+  Future<void> carregarTudo() async {
+    await Future.wait([
+      buscarPets(),
+      buscarTarefas(),
+    ]);
+  }
+
+  // 🐶 DOG API
+  Future<void> buscarPets() async {
+    final response = await http.get(
+      Uri.parse("https://api.thedogapi.com/v1/images/search?limit=10"),
+      headers: {
+        "x-api-key": "live_IMDyLmRcLBM3UILLDuAA6OPwwntoOQFn1LZP9LIxzoZFAffQpOHYkWKqgmClVu7V"
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final dados = jsonDecode(response.body);
 
       setState(() {
-        resultadoApi = dados[0]["nome"];
+        pets = dados;
       });
     }
+  }
+
+  // 📡 SUA API
+  Future<void> buscarTarefas() async {
+    final response = await http.get(
+      Uri.parse("https://api-prova-116j.onrender.com/tarefa"),
+    );
+
+    if (response.statusCode == 200) {
+      final dados = jsonDecode(response.body);
+
+      setState(() {
+        tarefas = dados;
+      });
+    }
+  }
+
+  Future<void> atualizarFeed() async {
+    await carregarTudo();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tarefas"),
+        title: const Text("🐾 Feed de Pets"),
         centerTitle: true,
         elevation: 0,
       ),
+
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF2575FC), Color(0xFF6A11CB)],
@@ -44,102 +81,99 @@ class _TelaGetState extends State<TelaGet> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
 
-                // Card com resultado
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10,
-                        color: Colors.black.withOpacity(0.1),
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.list_alt, size: 40, color: Colors.blue),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Resultado da API",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        resultadoApi,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
+        child: RefreshIndicator(
+          onRefresh: atualizarFeed,
+
+          child: ListView.builder(
+            itemCount: pets.length,
+            itemBuilder: (context, index) {
+
+              final pet = pets[index];
+              final tarefa = tarefas.isNotEmpty
+                  ? tarefas[index % tarefas.length]
+                  : null;
+
+              return Container(
+                margin: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
                 ),
 
-                const SizedBox(height: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                // Botão GET
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: fazerGet,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // 🐶 IMAGEM
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Image.network(
+                        pet["url"],
+                        height: 220,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    child: const Text(
-                      "Buscar Tarefa",
-                      style: TextStyle(fontSize: 16),
+
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          // ❤️ AÇÕES
+                          Row(
+                            children: const [
+                              Icon(Icons.favorite_border),
+                              SizedBox(width: 10),
+                              Icon(Icons.comment),
+                              SizedBox(width: 10),
+                              Icon(Icons.share),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // 📜 TAREFA
+                          Text(
+                            tarefa != null
+                                ? "Tarefa: ${tarefa["nome"]}"
+                                : "Sem tarefas",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          // 🐾 TEXTO MOCK
+                          const Text(
+                            "Cuidando bem do seu pet todos os dias 🐶✨",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-
-                const SizedBox(height: 15),
-
-                // Botão navegar
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => TelaPost())),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: Colors.white),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      "Ir para tela POST",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
+      ),
+
+      // 🔄 BOTÃO FLUTUANTE
+      floatingActionButton: FloatingActionButton(
+        onPressed: atualizarFeed,
+        child: const Icon(Icons.refresh),
       ),
     );
   }

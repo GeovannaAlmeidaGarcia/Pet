@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prova/navigation/navbar.dart';
 import 'package:prova/screens/get.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(seconds: 6), (){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context)=> TelaGet())
+          MaterialPageRoute(builder: (context)=> Navbar())
         );
       }
     );

@@ -14,7 +14,7 @@ class _TelaPostState extends State<TelaPost> {
 
   void fazerPost() async {
     final respostaServidor = await http.post(
-      Uri.parse("http://localhost:3000/tarefa"),
+      Uri.parse("https://api-prova-116j.onrender.com/tarefa"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "nome": nomeDigitado.text,
@@ -30,6 +30,12 @@ class _TelaPostState extends State<TelaPost> {
         const SnackBar(content: Text("Erro ao enviar, tente novamente!")),
       );
     }
+    /* Se fosse para fazer esse if e else em python seria:
+    if resposta_servidor.status_code == 201:
+    print("Dados enviados com sucesso")
+    else:
+    print("Erro ao enviar, tente novamente!")
+    */
   }
 
   @override
