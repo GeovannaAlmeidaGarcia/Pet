@@ -1,4 +1,4 @@
-# 🍄 Mario Treasure Hunt - SENAI Roberto Mange
+# 🍄 Mario - SENAI Roberto Mange
 
 Um jogo interativo de caça ao tesouro inspirado no universo do Mario, desenvolvido em React.  
 O objetivo é explorar o mapa da escola SENAI Roberto Mange, completar desafios e desbloquear novas etapas até encontrar o tesouro final.
