@@ -85,10 +85,7 @@ Este projeto foi desenvolvido com foco em:
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **Seu Nome**
+Desenvolvido pela aluna **Geovanna de Almeida Garcia**
 
 ---
 
-## 📜 Licença
-
-Este projeto foi desenvolvido para fins educacionais.
